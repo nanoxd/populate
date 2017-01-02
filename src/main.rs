@@ -9,6 +9,7 @@ use std::path::Path;
 use std::error::Error;
 use std::io;
 use std::fmt;
+use std::process;
 
 #[derive(Debug)]
 enum CliError {
@@ -127,6 +128,7 @@ fn main() {
     let mut opts = Options::new();
     opts.optopt("f", "file", "Choose an input file, instead of using STDIN", "NAME");
     opts.optflag("h", "help", "Show this usage message");
+    opts.optflag("q", "quiet", "Silences errors and warnings");
 
     let matches = match opts.parse(&args[1..]) {
         Ok(m) => { m },
@@ -148,11 +150,10 @@ fn main() {
     };
 
     match search(&data_path, city) {
-        Ok(pops) => {
-            for pop in pops {
-                println!("{}, {}: {:?}", pop.city, pop.country, pop.count);
-            }
-        },
-        Err(err) => println!("{}", err)
+        Err(CliError::NotFound) if matches.opt_present("q") => process::exit(1),
+        Err(err) => panic!("{}", err),
+        Ok(pops) => for pop in pops {
+            println!("{}, {}: {:?}", pop.city, pop.country, pop.count);
+        }
     }
 }
