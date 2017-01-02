@@ -40,4 +40,7 @@ fn main() {
 
     let data_path = &matches.free[0];
     let city: &str = &matches.free[1];
+
+    let file = File::open(data_path).unwrap();
+    let mut reader = csv::Reader::from_reader(file);
 }
