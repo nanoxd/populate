@@ -91,7 +91,7 @@ fn print_usage(program: &str, opts: Options) {
     println!("{}", opts.usage(&format!("Usage: {} [options] <city>", program)));
 }
 
-fn search<P: AsRef<Path>>(file_path: &Option<P>, city: &str) -> Result<Vec<PopulationCount>, Box<Error>> {
+fn search<P: AsRef<Path>>(file_path: &Option<P>, city: &str) -> Result<Vec<PopulationCount>, CliError> {
     let mut found = vec![];
 
     let input: Box<io::Read> = match *file_path {
@@ -114,7 +114,7 @@ fn search<P: AsRef<Path>>(file_path: &Option<P>, city: &str) -> Result<Vec<Popul
     }
 
     if found.is_empty() {
-        Err(From::from("No matching criteria with a population were found."))
+        Err(CliError::NotFound)
     } else {
         Ok(found)
     }
