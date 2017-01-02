@@ -1,8 +1,21 @@
 extern crate getopts;
 extern crate rustc_serialize;
+extern crate csv;
 
 use getopts::Options;
 use std::env;
+use std::fs::File;
+
+#[derive(Debug, RustcDecodable)]
+struct Row {
+    country: String,
+    city: String,
+    accent_city: String,
+    region: String,
+    population: Option<u64>,
+    latitude: Option<f64>,
+    longitude: Option<f64>,
+}
 
 fn print_usage(program: &str, opts: Options) {
     println!("{}", opts.usage(&format!("Usage: {} [options] <data-path> <city>", program)));
