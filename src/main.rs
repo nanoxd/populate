@@ -17,6 +17,12 @@ struct Row {
     longitude: Option<f64>,
 }
 
+struct PopulationCount {
+    city: String,
+    country: String,
+    count: u64,
+}
+
 fn print_usage(program: &str, opts: Options) {
     println!("{}", opts.usage(&format!("Usage: {} [options] <data-path> <city>", program)));
 }
