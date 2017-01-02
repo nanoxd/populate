@@ -48,6 +48,18 @@ impl fmt::Display for CliError {
     }
 }
 
+impl From<io::Error> for CliError {
+    fn from(err: io::Error) -> CliError {
+        CliError::Io(err)
+    }
+}
+
+impl From<csv::Error> for CliError {
+    fn from(err: csv::Error) -> CliError {
+        CliError::Csv(err)
+    }
+}
+
 #[derive(Debug, RustcDecodable)]
 struct Row {
     country: String,
