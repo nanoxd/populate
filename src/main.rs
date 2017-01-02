@@ -5,6 +5,7 @@ extern crate csv;
 use getopts::Options;
 use std::env;
 use std::fs::File;
+use std::path::Path;
 
 #[derive(Debug, RustcDecodable)]
 struct Row {
@@ -23,8 +24,38 @@ struct PopulationCount {
     count: u64,
 }
 
+impl PopulationCount {
+    fn new(city: String, country: String, count: u64) -> PopulationCount {
+        PopulationCount {
+            city: city,
+            country: country,
+            count: count,
+        }
+    }
+}
+
 fn print_usage(program: &str, opts: Options) {
     println!("{}", opts.usage(&format!("Usage: {} [options] <data-path> <city>", program)));
+}
+
+fn search<P: AsRef<Path>>(file_path: P, city: &str) -> Vec<PopulationCount> {
+    let mut found = vec![];
+    let file = File::open(file_path).unwrap();
+    let mut reader = csv::Reader::from_reader(file);
+
+    for row in reader.decode::<Row>() {
+        let row = row.unwrap();
+
+        match row.population {
+            None => {},
+            Some(count) => if row.city == city {
+                found.push(
+                    PopulationCount::new(row.city, row.country, count));
+            },
+        }
+    }
+
+    found
 }
 
 fn main() {
@@ -47,18 +78,7 @@ fn main() {
     let data_path = &matches.free[0];
     let city: &str = &matches.free[1];
 
-    let file = File::open(data_path).unwrap();
-    let mut reader = csv::Reader::from_reader(file);
-
-    for row in reader.decode::<Row>() {
-        let row = row.unwrap();
-
-        if row.city == city {
-            println!("{}, {}: {:?}",
-                row.city,
-                row.country,
-                row.population.expect("population count")
-            );
-        }
+    for pop in search(data_path, city) {
+        println!("{}, {}: {:?}", pop.city, pop.country, pop.count);
     }
 }
