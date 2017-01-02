@@ -3,4 +3,10 @@ name = "populate"
 version = "0.1.0"
 authors = ["Fernando Paredes <nano@fdp.io>"]
 
+[[bin]]
+name = "populate"
+
 [dependencies]
+csv = "0.*"
+rustc-serialize = "0.*"
+getopts = "0.*"
