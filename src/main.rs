@@ -43,4 +43,16 @@ fn main() {
 
     let file = File::open(data_path).unwrap();
     let mut reader = csv::Reader::from_reader(file);
+
+    for row in reader.decode::<Row>() {
+        let row = row.unwrap();
+
+        if row.city == city {
+            println!("{}, {}: {:?}",
+                row.city,
+                row.country,
+                row.population.expect("population count")
+            );
+        }
+    }
 }
