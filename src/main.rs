@@ -8,6 +8,45 @@ use std::fs::File;
 use std::path::Path;
 use std::error::Error;
 use std::io;
+use std::fmt;
+
+#[derive(Debug)]
+enum CliError {
+    Io(io::Error),
+    Csv(csv::Error),
+    NotFound,
+}
+
+impl Error for CliError {
+    fn description(&self) -> &str {
+        match *self {
+            CliError::Io(ref err) => err.description(),
+            CliError::Csv(ref err) => err.description(),
+            CliError::NotFound => "not found",
+        }
+    }
+
+    fn cause(&self) -> Option<&Error> {
+        match *self {
+            CliError::Io(ref err) => Some(err),
+            CliError::Csv(ref err) => Some(err),
+            // Our custom error doesn't have an underlying cause,
+            // but we could modify it so that it does.
+            CliError::NotFound => None,
+        }
+    }
+}
+
+impl fmt::Display for CliError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match *self {
+            CliError::Io(ref err) => err.fmt(f),
+            CliError::Csv(ref err) => err.fmt(f),
+            CliError::NotFound => write!(f, "No matching cities with a \
+                                             population were found."),
+        }
+    }
+}
 
 #[derive(Debug, RustcDecodable)]
 struct Row {
